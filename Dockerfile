@@ -1,9 +1,9 @@
-ARG VERSION_CUDA=10.0-cudnn7
+ARG VERSION_CUDA=11.1-cudnn8
 ARG VERSION_UBUNTU=18.04
 
 FROM nvidia/cuda:${VERSION_CUDA}-devel-ubuntu${VERSION_UBUNTU} as build
 
-ARG VERSION_FFMPEG=4.3.1
+ARG VERSION_FFMPEG=4.3.2
 ARG VERSION_LIBTENSORFLOW=1.15.0
 ARG DEPENDENCIES="\
   autoconf \
@@ -62,9 +62,9 @@ ENTRYPOINT ["/usr/local/bin/ffmpeg"]
 
 FROM nvidia/cuda:${VERSION_CUDA}-runtime-ubuntu${VERSION_UBUNTU}
 
-LABEL authors="Vít Novotný <witiko@mail.muni.cz>,Mikuláš Bankovič <456421@mail.muni.cz>,Dirk Lüth <dirk.lueth@gmail.com>" \
+LABEL authors="Vít Novotný <witiko@mail.muni.cz>,Mikuláš Bankovič <456421@mail.muni.cz>,Dirk Lüth <dirk.lueth@gmail.com>, Jungseung Yang <jsyang@lablup.com>" \
       org.label-schema.docker.dockerfile="/Dockerfile" \
-      org.label-schema.name="jetson.ffmpeg"
+      org.label-schema.name="nvidia.ffmpeg"
 
 ARG DEPENDENCIES="\
   libgomp1 \
