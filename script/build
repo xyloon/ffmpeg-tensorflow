@@ -13,27 +13,154 @@ ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/lib/libcuda.so.1
 curl -fsSL https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-gpu-linux-x86_64-"$1".tar.gz | tar -xzC /usr/local -f -
 
 # Install ffmpeg
+#TEMPDIR="$(mktemp -d)"
+#trap 'rm -r "$TEMPDIR"' EXIT
+
+
+
+#mkdir -p /usr/local/ffmpeg_sources
+
+# Instaling NASM
+# cd /usr/local/ffmpeg_sources
+# wget -O /usr/local/ffmpeg_sources/nasm.tar.bz2 \
+#     	 https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VER}/nasm-${NASM_VER}.tar.bz2
+# mkdir -p /usr/local/ffmpeg_sources/nasm
+# tar jxvf /usr/local/ffmpeg_sources/nasm.tar.bz2 \
+#         -C /usr/local/ffmpeg_sources/nasm --strip-components 1 
+# cd /usr/local/ffmpeg_sources/nasm
+# ./autogen.sh
+# ./configure --prefix=/usr/local --enable-pic
+# make -j$(nproc)
+# make install
+
+# Installing YASM
+# cd /usr/local/ffmpeg_sources
+# wget -O /usr/local/ffmpeg_sources/yasm.tar.gz \
+#     	 https://www.tortall.net/projects/yasm/releases/yasm-${YASM_VER}.tar.gz
+# mkdir -p /usr/local/ffmpeg_sources/yasm
+# tar xzvf /usr/local/ffmpeg_sources/yasm.tar.gz \
+#         -C /usr/local/ffmpeg_sources/yasm --strip-components 1
+# cd /usr/local/ffmpeg_sources/yasm
+# ./configure --prefix=/usr/local --enable-pic
+# make -j$(nproc)
+# make install
+
+# libx264
+#cd /usr/local/ffmpeg_sources
+#git -C /usr/local/ffmpeg_sources/x264 pull 2> /dev/null || \
+#git clone --depth 1 https://code.videolan.org/videolan/x264
+#cd /usr/local/ffmpeg_sources/x264
+#./configure --enable-pic --enable-shared
+#make -j$(nproc)
+#make install
+
+# libx265
+#cd /usr/local/ffmpeg_sources
+#git clone https://github.com/videolan/x265 \
+#        /usr/local/ffmpeg_sources/x265
+#cd /usr/local/ffmpeg_sources/x265/build/linux
+#cmake -G "Unix Makefiles"  ../../source
+#make -j$(nproc)
+#make install
+
+# libvpx
+# cd /usr/local/ffmpeg_sources
+# git -C libvpx pull 2> /dev/null || \
+#   git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
+# cd /usr/local/ffmpeg_sources/libvpx
+# ./configure --enable-pic --enable-shared --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
+# make -j$(nproc)
+# make install
+
+# libfdk-aac
+# cd /usr/local/ffmpeg_sources
+# git -C fdk-aac pull 2> /dev/null || \
+#   git clone --depth 1 https://github.com/mstorsjo/fdk-aac
+# cd fdk-aac
+# autoreconf -fiv
+# ./configure --enable-pic --enable-shared
+# make -j$(nproc)
+# make install
+
+# libmp3lame
+# cd /usr/local/ffmpeg_sources
+# wget -O /usr/local/ffmpeg_sources/lame.tar.gz \
+#      https://downloads.sourceforge.net/project/lame/lame/${LAME_VER}/lame-${LAME_VER}.tar.gz
+# mkdir -p /usr/local/ffmpeg_sources/lame
+# tar xzvf /usr/local/ffmpeg_sources/lame.tar.gz \
+#     -C /usr/local/ffmpeg_sources/lame --strip-components 1
+# cd /usr/local/ffmpeg_sources/lame
+# ./configure --enable-nasm --enable-pic --enable-shared
+# make -j$(nproc)
+# make install
+
+# install libopus
+# cd /usr/local/ffmpeg_sources
+# git -C opus pull 2> /dev/null || \
+#   git clone --depth 1 https://github.com/xiph/opus
+# cd opus
+# ./autogen.sh
+# ./configure --enable-pic --enable-shared
+# make -j$(nproc)
+# make install
+
+# install nvidias codec API
+#cd /usr/local/ffmpeg_sources
+
+
+# ffmpeg
+#cd /usr/local/ffmpeg_sources
+#wget -O /usr/local/ffmpeg_sources/ffmpeg.tar.bz2 \
+#     https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VER}.tar.bz2
+#mkdir -p /usr/local/ffmpeg_sources/ffmpeg
+#tar jxvf /usr/local/ffmpeg_sources/ffmpeg.tar.bz2 \
+#    -C /usr/local/ffmpeg_sources/ffmpeg --strip-components 1
+#cd /usr/local/ffmpeg_sources/ffmpeg
+
+# 
+TEMPDIR1="$(mktemp -d)"
+trap 'rm -r "$TEMPDIR1"' EXIT
+
+pushd "$TEMPDIR1"
+git -C nv-codec-headers pull 2> /dev/null || \
+  git clone https://github.com/FFmpeg/nv-codec-headers
+cd nv-codec-headers
+make -j$(nproc)
+make install
+popd
+
+
+# Install ffmpeg
 TEMPDIR="$(mktemp -d)"
 trap 'rm -r "$TEMPDIR"' EXIT
 
 curl -fsSL https://ffmpeg.org/releases/ffmpeg-"$2".tar.bz2 | tar --strip 1 -xjC "$TEMPDIR" -f -
 pushd "$TEMPDIR"
 ./configure \
- --pkg-config-flags='--static' \
- --extra-libs='-lpthread -lm' \
- --enable-gpl \
- --enable-gnutls \
- --enable-libass \
- --enable-libfdk-aac \
- --enable-libfreetype \
- --enable-libmp3lame \
- --enable-libopus \
- --enable-libvorbis \
- --enable-libvpx \
- --enable-libx264 \
- --enable-libx265 \
- --enable-libtensorflow \
- --enable-nonfree
+  --extra-libs="-lpthread -lm" \
+  --enable-gpl \
+  --enable-gnutls \
+  --enable-libass \
+  --enable-libnpp \
+  --enable-shared \
+  --enable-libfdk-aac \
+  --enable-libfreetype \
+  --enable-libmp3lame \
+  --enable-libopus \
+  --enable-libvorbis \
+  --enable-libvpx \
+  --enable-libx264 \
+  --enable-libx265 \
+  --enable-cuda \
+  --enable-cuvid \
+  --enable-nvenc \
+  --enable-libnpp \
+  --enable-pic \
+  --enable-indev=v4l2 \
+  --enable-libtensorflow \
+  --extra-cflags=-I/usr/local/cuda/include \
+  --extra-ldflags=-L/usr/local/cuda/lib64 \
+  --enable-nonfree
 make -j "$(nproc)"
 make install
 popd
@@ -42,3 +169,5 @@ popd
 mkdir -p /deps/usr/local/lib
 mv /usr/local/lib/libtensorflow* /deps/usr/local/lib
 ldd /usr/local/bin/ffmpeg | tr -s '[:blank:]' '\n' | grep '^/' | xargs -I % sh -c 'mkdir -p $(dirname /deps%); cp % /deps%;'
+
+#find / -name "libavdevice.so*"

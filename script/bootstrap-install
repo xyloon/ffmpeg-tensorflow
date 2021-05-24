@@ -8,11 +8,26 @@ set -o xtrace
 if [[ "$*" == *' python3.6 '* ]]
 then
   apt-get -qy install software-properties-common
-  add-apt-repository ppa:deadsnakes/ppa
+  add-apt-repository -y ppa:deadsnakes/ppa
+  add-apt-repository -y ppa:bashtop-monitor/bashtop
   apt-get -qy update
 fi
 
 if (( $# > 0 ))
 then
+  #package_names = "$@"
+  #pnames = ${#package_names[@]}
+  for pname in $@;
+  do
+    (apt-cache depends $pname | grep "libstdc++-4.8-dev") && echo $pname && apt-cache depends $pname;
+  done
+  #apt-get -qy install "$package_names"
   apt-get -qy install "$@"
 fi
+
+apt-get install -y python3.6-distutils python-apt curl
+
+update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+
+curl https://bootstrap.pypa.io/get-pip.py | python3
+python3 -m pip install --no-cache-dir -U setuptools pip
